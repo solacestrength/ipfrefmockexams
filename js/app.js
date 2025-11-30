@@ -94,3 +94,27 @@ document.getElementById("submitButton").addEventListener("click", () => {
 // Load first exam on page load
 loadExam("exam1");
 examSelect.addEventListener("change", () => loadExam(examSelect.value));
+
+/* ========== THEME TOGGLE ========== */
+
+const toggleBtn = document.getElementById("themeToggle");
+
+// Load saved preference
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+  document.body.classList.add("dark");
+  toggleBtn.textContent = "☀️ Light Mode";
+}
+
+// Toggle on click
+toggleBtn.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("dark");
+
+  if (isDark) {
+    toggleBtn.textContent = "☀️ Light Mode";
+    localStorage.setItem("theme", "dark");
+  } else {
+    toggleBtn.textContent = "🌙 Dark Mode";
+    localStorage.setItem("theme", "light");
+  }
+});
