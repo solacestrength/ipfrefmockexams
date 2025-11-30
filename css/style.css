@@ -28,6 +28,22 @@ body {
   color: var(--text-main);
 }
 
+/* ===== DARK THEME ===== */
+
+body.dark {
+  --bg: #0f172a;
+  --bg-card: #111827;
+  --border: #1f2937;
+  --text-main: #e2e8f0;
+  --text-subtle: #94a3b8;
+  --accent: #38bdf8;
+  --accent-light: rgba(56, 189, 248, 0.2);
+  --success: #22c55e;
+  --danger: #f87171;
+  background: radial-gradient(circle at top, #1e293b 0, #0f172a 55%, #0a0f1a 100%);
+  color: var(--text-main);
+}
+
 /* ==== Outer Shell ==== */
 .app-shell {
   max-width: 1000px;
