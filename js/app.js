@@ -18,6 +18,8 @@ const exportFullBtn = document.getElementById("exportFull");
 const exportWrongBtn = document.getElementById("exportWrong");
 const submitButton = document.getElementById("submitButton");
 const saveProgressBtn = document.getElementById("saveProgressBtn");
+const resetSectionBtn = document.getElementById("resetSectionBtn");
+const clearProgressBtn = document.getElementById("clearProgressBtn");
 const themeToggle = document.getElementById("themeToggle");
 
 /*****************************************************
@@ -26,7 +28,7 @@ const themeToggle = document.getElementById("themeToggle");
 let currentExam = null;
 let currentExamScript = null;
 let currentSectionIndex = 0;
-let answers = {}; // questionId → "A"/"B"/"C"/"D"
+let answers = {}; // questionId → letter
 let pendingRestore = null;
 
 /*****************************************************
@@ -60,7 +62,7 @@ window.addEventListener("DOMContentLoaded", () => {
   populateExamDropdown();
   attachHandlers();
 
-  // Attempt to restore progress first
+  // Try restore first
   if (!loadProgress()) {
     if (window.examList && window.examList.length > 0) {
       loadExam(window.examList[0].id);
@@ -91,7 +93,6 @@ function loadExam(examId) {
     currentExamScript = null;
   }
 
-  // Reset display
   currentExam = null;
   sectionsContainer.innerHTML = "";
   scorePercentEl.textContent = "–%";
@@ -100,29 +101,23 @@ function loadExam(examId) {
 
   const s = document.createElement("script");
   s.src = "js/" + info.file;
-
   s.onload = () => {
     currentExam = window.examData;
 
     if (pendingRestore && pendingRestore.examId === examId) {
-      // Restore saved state
       modeSelect.value = pendingRestore.mode || "full";
       currentSectionIndex = pendingRestore.sectionIndex || 0;
       answers = pendingRestore.answers || {};
-
-      populateSectionDropdown(currentExam);
-      showSection(currentSectionIndex);
-      updateModeUI();
-
       pendingRestore = null;
     } else {
-      // Fresh attempt
-      answers = {};
+      modeSelect.value = "full";
       currentSectionIndex = 0;
-      populateSectionDropdown(currentExam);
-      showSection(0);
-      updateModeUI();
+      answers = {};
     }
+
+    populateSectionDropdown(currentExam);
+    showSection(currentSectionIndex);
+    updateModeUI();
   };
 
   document.body.appendChild(s);
@@ -134,7 +129,7 @@ function populateSectionDropdown(exam) {
   exam.sections.forEach((sec, idx) => {
     const o = document.createElement("option");
     o.value = idx;
-    o.textContent = sec.title; // FIX: no duplicated numbering
+    o.textContent = sec.title; // no double numbers
     sectionSelect.appendChild(o);
   });
 }
@@ -145,17 +140,14 @@ function populateSectionDropdown(exam) {
 function showSection(index) {
   if (!currentExam) return;
   currentSectionIndex = index;
-
   sectionSelect.value = String(index);
 
   sectionsContainer.innerHTML = "";
   const section = currentExam.sections[index];
-
   renderSection(section);
   updateProgressBar();
   saveProgress();
 
-  // Scroll back to top of page
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -208,7 +200,6 @@ function updateProgressBar() {
     progressContainer.style.display = "none";
     return;
   }
-
   progressContainer.style.display = "block";
 
   const pct =
@@ -219,8 +210,8 @@ function updateProgressBar() {
 function updateModeUI() {
   const mode = modeSelect.value;
   submitButton.textContent = mode === "full" ? "Mark Exam" : "Mark Section";
-
   const disabled = mode === "single";
+
   prevSectionBtn.disabled = disabled;
   nextSectionBtn.disabled = disabled;
   prevSectionBottom.disabled = disabled;
@@ -243,24 +234,28 @@ function attachHandlers() {
     showSection(parseInt(e.target.value, 10));
   });
 
-  // TOP navigation
+  // Top nav
   prevSectionBtn.addEventListener("click", () => {
+    if (!currentExam) return;
     if (currentSectionIndex > 0)
       showSection(currentSectionIndex - 1);
   });
 
   nextSectionBtn.addEventListener("click", () => {
+    if (!currentExam) return;
     if (currentSectionIndex < currentExam.sections.length - 1)
       showSection(currentSectionIndex + 1);
   });
 
-  // BOTTOM navigation
+  // Bottom nav
   prevSectionBottom.addEventListener("click", () => {
+    if (!currentExam) return;
     if (currentSectionIndex > 0)
       showSection(currentSectionIndex - 1);
   });
 
   nextSectionBottom.addEventListener("click", () => {
+    if (!currentExam) return;
     if (currentSectionIndex < currentExam.sections.length - 1)
       showSection(currentSectionIndex + 1);
   });
@@ -272,12 +267,34 @@ function attachHandlers() {
 
   saveProgressBtn.addEventListener("click", () => {
     saveProgress();
-    const original = saveProgressBtn.textContent;
-    saveProgressBtn.textContent = "Saved ✓";
-    setTimeout(() => {
-      saveProgressBtn.textContent = original;
-    }, 1100);
+    flashButton(saveProgressBtn, "Saved ✓");
   });
+
+  clearProgressBtn.addEventListener("click", () => {
+    localStorage.removeItem("examProgress");
+    answers = {};
+    const current = examSelect.value;
+    loadExam(current);
+    flashButton(clearProgressBtn, "Cleared ✓");
+  });
+
+  resetSectionBtn.addEventListener("click", () => {
+    resetCurrentSectionAnswers();
+    flashButton(resetSectionBtn, "Section Reset ✓");
+  });
+}
+
+/*****************************************************
+ * SMALL UI HELPERS
+ *****************************************************/
+function flashButton(btn, label) {
+  const original = btn.textContent;
+  btn.textContent = label;
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.disabled = false;
+  }, 1100);
 }
 
 /*****************************************************
@@ -327,7 +344,6 @@ function markCurrentSection() {
     const labels = qDiv.querySelectorAll("label");
     labels.forEach(label => {
       label.classList.remove("opt-correct", "opt-incorrect-selected");
-
       const input = label.querySelector("input");
       if (!input) return;
 
@@ -340,6 +356,19 @@ function markCurrentSection() {
 
     if (!chosen) qDiv.classList.add("unanswered");
   });
+}
+
+/*****************************************************
+ * RESET HELPERS
+ *****************************************************/
+function resetCurrentSectionAnswers() {
+  if (!currentExam) return;
+  const section = currentExam.sections[currentSectionIndex];
+  section.questions.forEach(q => {
+    delete answers[q.id];
+  });
+  saveProgress();
+  showSection(currentSectionIndex);
 }
 
 /*****************************************************
@@ -364,7 +393,6 @@ function loadProgress() {
 
   try {
     const data = JSON.parse(raw);
-
     if (!data.examId) return false;
 
     pendingRestore = {
@@ -381,13 +409,13 @@ function loadProgress() {
     loadExam(pendingRestore.examId);
     return true;
   } catch (e) {
-    console.error("ERROR restoring progress:", e);
+    console.error("Failed to load progress:", e);
     return false;
   }
 }
 
 /*****************************************************
- * EXPORT RESULTS (FULL TEXT VERSION)
+ * EXPORT RESULTS (FULL TEXT ANSWERS)
  *****************************************************/
 function buildExportScope(onlyIncorrect) {
   const mode = modeSelect.value;
@@ -402,11 +430,12 @@ function buildExportScope(onlyIncorrect) {
 }
 
 function generateResultHTML(onlyIncorrect) {
-  const scope = buildExportScope(onlyIncorrect);
-  const { mode, sections } = scope;
+  const { mode, sections } = buildExportScope(onlyIncorrect);
 
   let title = currentExam.title;
-  if (mode === "single") title += " – " + sections[0].title;
+  if (mode === "single") {
+    title += " – " + sections[0].title;
+  }
 
   const green = "#22c55e";
   const red = "#f97373";
@@ -491,18 +520,22 @@ function generateResultHTML(onlyIncorrect) {
 }
 
 function downloadResults(onlyIncorrect) {
+  if (!currentExam) return;
+
   const html = generateResultHTML(onlyIncorrect);
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
-  const prefix = modeSelect.value === "full" ? "exam" : `section-${currentSectionIndex + 1}`;
+  const base =
+    modeSelect.value === "full"
+      ? "exam"
+      : `section-${currentSectionIndex + 1}`;
 
+  const a = document.createElement("a");
   a.href = url;
   a.download = onlyIncorrect
-    ? `${prefix}-incorrect.html`
-    : `${prefix}-full.html`;
-
+    ? `${base}-incorrect.html`
+    : `${base}-full.html`;
   document.body.appendChild(a);
   a.click();
   a.remove();
