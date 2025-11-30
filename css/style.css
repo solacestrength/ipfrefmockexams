@@ -173,6 +173,11 @@ body.dark select {
   margin-top: 16px;
 }
 
+.bottom-nav {
+  margin-top: 24px;
+  justify-content: space-between;
+}
+
 .nav-btn {
   padding: 6px 12px;
   border-radius: 999px;
@@ -281,12 +286,6 @@ body.dark .theme-toggle {
   color: var(--text-subtle);
 }
 
-.bottom-nav {
-  margin-top: 24px;
-  display: flex;
-  justify-content: space-between;
-}
-
 /* ===== Results & buttons ===== */
 .results-panel {
   margin-top: 20px;
@@ -338,6 +337,29 @@ body.dark .theme-toggle {
 
 .secondary-btn:hover {
   background: var(--accent-light);
+}
+
+.warn-btn {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.warn-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.danger-btn {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--danger);
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.danger-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
 }
 
 .export-buttons {
