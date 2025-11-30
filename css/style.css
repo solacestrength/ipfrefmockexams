@@ -239,3 +239,29 @@ input[type="radio"] {
 .theme-toggle:hover {
   background: #f1f5f9;
 }
+
+/* ===== DARK MODE OVERRIDES ===== */
+body.dark {
+  --bg: #0f172a;
+  --bg-card: #1e293b;            /* darker card background */
+  --border: #2a3441;
+  --text-main: #e2e8f0;          /* HIGH contrast text */
+  --text-subtle: #94a3b8;
+  --accent: #38bdf8;
+  --accent-light: rgba(56, 189, 248, 0.2);
+  --success: #22c55e;
+  --danger: #f87171;
+}
+
+/* Ensure cards adapt in dark mode */
+body.dark .section-card {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-main);
+}
+
+/* Ensure ALL question text adapts */
+body.dark .question p,
+body.dark .question label {
+  color: var(--text-main);
+}
