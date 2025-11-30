@@ -6,33 +6,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
   <div class="app-shell">
-    <header>
-      <h1>IPF Technical Rules – Mock Exams</h1>
-      <button id="themeToggle" class="theme-toggle">
-  🌙 Dark Mode
-</button>
-      <label>Select Exam Version:</label>
-      <select id="examSelect"></select>
+    <header class="app-header">
+      <div class="header-top">
+        <h1>IPF Technical Rules<br>Mock Exams</h1>
+        <button id="themeToggle" class="theme-toggle">🌙 Dark Mode</button>
+      </div>
+      <p class="header-sub">
+        Practice multiple-choice exams based on the IPF Technical Rulebook.
+      </p>
+
+      <div class="control-row">
+        <div class="control-group">
+          <label for="modeSelect">Practice Mode:</label>
+          <select id="modeSelect" class="mode-select">
+            <option value="full">Full Exam (all sections)</option>
+            <option value="single">Single Section Only</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="examSelect">Select Exam Version:</label>
+          <select id="examSelect" class="exam-select"></select>
+        </div>
+      </div>
+
+      <div id="sectionNav" class="section-nav">
+        <button id="prevSection" class="nav-btn">← Previous</button>
+        <select id="sectionSelect" class="section-select"></select>
+        <button id="nextSection" class="nav-btn">Next →</button>
+      </div>
+
+      <div id="progressContainer" class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
     </header>
 
-    <main class="layout">
-      <form id="examForm" class="exam-card">
-        <div id="sectionsContainer"></div>
-      </form>
+    <main class="app-main">
+      <div id="sectionsContainer"></div>
 
-      <aside class="side-card">
-        <h2>Results</h2>
-        <div id="scorePercent">–%</div>
-        <div id="scoreSummary"></div>
-        <button id="submitButton" type="button">Mark Exam</button>
-      </aside>
+      <div class="results-panel">
+        <div class="score-display">
+          <span id="scorePercent" class="score-percent">–%</span>
+          <span id="scoreSummary" class="score-summary"></span>
+        </div>
+        <button id="submitButton" class="primary-btn">Mark Exam</button>
+      </div>
+
+      <div id="exportButtons" class="export-buttons" style="display:none;">
+        <button id="exportFull" class="export-btn">Download Full Results</button>
+        <button id="exportWrong" class="export-btn">Download Incorrect Only</button>
+      </div>
     </main>
   </div>
 
-  <!-- Load core app logic -->
   <script src="js/exams.js"></script>
   <script src="js/app.js"></script>
 </body>
