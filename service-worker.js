@@ -13,7 +13,7 @@ const FILES_TO_CACHE = [
   "/js/exam5.js",
   "/js/exam6.js",
   "/js/exam7.js",
-  "/icons/icon-512.jpg",
+  "/icons/icon-512.png",
   // add icons if you have them
 ];
 
