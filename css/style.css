@@ -55,6 +55,17 @@ body.dark {
   border: 1px solid var(--border);
 }
 
+/* === DARK MODE: Toggle Button === */
+body.dark .theme-toggle {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #2a3441;
+}
+
+body.dark .theme-toggle:hover {
+  background: #273549;
+}
+
 /* ==== Header ==== */
 h1 {
   margin: 0 0 12px 0;
