@@ -1,3 +1,6 @@
+/*****************************************************
+ * Global DOM references
+ *****************************************************/
 const examSelect = document.getElementById("examSelect");
 const sectionsContainer = document.getElementById("sectionsContainer");
 const scorePercentEl = document.getElementById("scorePercent");
@@ -6,35 +9,41 @@ const modeSelect = document.getElementById("modeSelect");
 const sectionSelect = document.getElementById("sectionSelect");
 const prevSectionBtn = document.getElementById("prevSection");
 const nextSectionBtn = document.getElementById("nextSection");
+const prevSectionBottom = document.getElementById("prevSectionBottom");
+const nextSectionBottom = document.getElementById("nextSectionBottom");
 const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const exportButtons = document.getElementById("exportButtons");
 const exportFullBtn = document.getElementById("exportFull");
 const exportWrongBtn = document.getElementById("exportWrong");
 const submitButton = document.getElementById("submitButton");
-const themeToggle = document.getElementById("themeToggle");
 const saveProgressBtn = document.getElementById("saveProgressBtn");
+const themeToggle = document.getElementById("themeToggle");
 
+/*****************************************************
+ * State variables
+ *****************************************************/
 let currentExam = null;
 let currentExamScript = null;
 let currentSectionIndex = 0;
-let answers = {}; // { questionId: "A" | "B" | ... }
+let answers = {}; // questionId → "A"/"B"/"C"/"D"
 let pendingRestore = null;
 
-// ==================== THEME ====================
+/*****************************************************
+ * THEME SYSTEM
+ *****************************************************/
 function applySavedTheme() {
   const saved = localStorage.getItem("theme") || "light";
-  if (saved === "dark") {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
+  if (saved === "dark") document.body.classList.add("dark");
+  else document.body.classList.remove("dark");
   updateThemeToggleLabel();
 }
 
 function updateThemeToggleLabel() {
-  const isDark = document.body.classList.contains("dark");
-  themeToggle.textContent = isDark ? "🌞 Light Mode" : "🌙 Dark Mode";
+  themeToggle.textContent =
+    document.body.classList.contains("dark")
+      ? "🌞 Light Mode"
+      : "🌙 Dark Mode";
 }
 
 themeToggle.addEventListener("click", () => {
@@ -43,13 +52,15 @@ themeToggle.addEventListener("click", () => {
   updateThemeToggleLabel();
 });
 
-// ==================== DOM READY ====================
+/*****************************************************
+ * DOM READY
+ *****************************************************/
 window.addEventListener("DOMContentLoaded", () => {
   applySavedTheme();
   populateExamDropdown();
   attachHandlers();
 
-  // Try restoring progress; if none, load first exam
+  // Attempt to restore progress first
   if (!loadProgress()) {
     if (window.examList && window.examList.length > 0) {
       loadExam(window.examList[0].id);
@@ -57,7 +68,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ==================== EXAM LOADING ====================
+/*****************************************************
+ * EXAM LOADING
+ *****************************************************/
 function populateExamDropdown() {
   examSelect.innerHTML = "";
   window.examList.forEach(exam => {
@@ -72,36 +85,38 @@ function loadExam(examId) {
   const info = window.examList.find(e => e.id === examId);
   if (!info) return;
 
-  // Remove old script
+  // Remove previous exam script
   if (currentExamScript) {
     document.body.removeChild(currentExamScript);
     currentExamScript = null;
   }
 
-  // Reset UI state
+  // Reset display
   currentExam = null;
   sectionsContainer.innerHTML = "";
   scorePercentEl.textContent = "–%";
   scoreSummaryEl.textContent = "";
   exportButtons.style.display = "none";
 
-  // Answers remain; they might be restored
-
   const s = document.createElement("script");
   s.src = "js/" + info.file;
+
   s.onload = () => {
     currentExam = window.examData;
-    // If we have pending restore for this exam, apply it
+
     if (pendingRestore && pendingRestore.examId === examId) {
+      // Restore saved state
       modeSelect.value = pendingRestore.mode || "full";
       currentSectionIndex = pendingRestore.sectionIndex || 0;
       answers = pendingRestore.answers || {};
+
       populateSectionDropdown(currentExam);
       showSection(currentSectionIndex);
       updateModeUI();
+
       pendingRestore = null;
     } else {
-      // Default fresh exam
+      // Fresh attempt
       answers = {};
       currentSectionIndex = 0;
       populateSectionDropdown(currentExam);
@@ -109,6 +124,7 @@ function loadExam(examId) {
       updateModeUI();
     }
   };
+
   document.body.appendChild(s);
   currentExamScript = s;
 }
@@ -118,22 +134,28 @@ function populateSectionDropdown(exam) {
   exam.sections.forEach((sec, idx) => {
     const o = document.createElement("option");
     o.value = idx;
-    o.textContent = sec.title; // no duplicated numbers
+    o.textContent = sec.title; // FIX: no duplicated numbering
     sectionSelect.appendChild(o);
   });
 }
 
-// ==================== RENDERING ====================
+/*****************************************************
+ * SECTION RENDERING
+ *****************************************************/
 function showSection(index) {
   if (!currentExam) return;
   currentSectionIndex = index;
+
   sectionSelect.value = String(index);
 
   sectionsContainer.innerHTML = "";
   const section = currentExam.sections[index];
+
   renderSection(section);
   updateProgressBar();
   saveProgress();
+
+  // Scroll back to top of page
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -153,21 +175,16 @@ function renderSection(section) {
 
     const optionsHtml = Object.keys(q.options)
       .map(letter => {
-        const checked =
-          answers[q.id] && answers[q.id] === letter ? "checked" : "";
+        const checked = answers[q.id] === letter ? "checked" : "";
         return `
           <label>
             <input type="radio" name="${q.id}" value="${letter}" ${checked}>
             ${letter}) ${q.options[letter]}
-          </label>
-        `;
+          </label>`;
       })
       .join("<br>");
 
-    qDiv.innerHTML = `
-      <p>${q.text}</p>
-      ${optionsHtml}
-    `;
+    qDiv.innerHTML = `<p>${q.text}</p>${optionsHtml}`;
 
     qDiv.querySelectorAll('input[type="radio"]').forEach(input => {
       input.addEventListener("change", () => {
@@ -182,19 +199,18 @@ function renderSection(section) {
   sectionsContainer.appendChild(card);
 }
 
-// ==================== NAVIGATION & MODE ====================
+/*****************************************************
+ * NAVIGATION & MODE
+ *****************************************************/
 function updateProgressBar() {
   const mode = modeSelect.value;
-  if (!currentExam) {
+  if (!currentExam || mode === "single") {
     progressContainer.style.display = "none";
     return;
   }
 
-  if (mode === "single") {
-    progressContainer.style.display = "none";
-    return;
-  }
   progressContainer.style.display = "block";
+
   const pct =
     ((currentSectionIndex + 1) / currentExam.sections.length) * 100;
   progressBar.style.width = pct + "%";
@@ -203,16 +219,19 @@ function updateProgressBar() {
 function updateModeUI() {
   const mode = modeSelect.value;
   submitButton.textContent = mode === "full" ? "Mark Exam" : "Mark Section";
+
   const disabled = mode === "single";
   prevSectionBtn.disabled = disabled;
   nextSectionBtn.disabled = disabled;
+  prevSectionBottom.disabled = disabled;
+  nextSectionBottom.disabled = disabled;
+
   updateProgressBar();
 }
 
 function attachHandlers() {
   examSelect.addEventListener("change", () => {
     loadExam(examSelect.value);
-    // When switching exams, we will save progress for new exam when answers are changed
   });
 
   modeSelect.addEventListener("change", () => {
@@ -224,16 +243,26 @@ function attachHandlers() {
     showSection(parseInt(e.target.value, 10));
   });
 
+  // TOP navigation
   prevSectionBtn.addEventListener("click", () => {
-    if (!currentExam) return;
-    if (currentSectionIndex > 0) showSection(currentSectionIndex - 1);
+    if (currentSectionIndex > 0)
+      showSection(currentSectionIndex - 1);
   });
 
   nextSectionBtn.addEventListener("click", () => {
-    if (!currentExam) return;
-    if (currentSectionIndex < currentExam.sections.length - 1) {
+    if (currentSectionIndex < currentExam.sections.length - 1)
       showSection(currentSectionIndex + 1);
-    }
+  });
+
+  // BOTTOM navigation
+  prevSectionBottom.addEventListener("click", () => {
+    if (currentSectionIndex > 0)
+      showSection(currentSectionIndex - 1);
+  });
+
+  nextSectionBottom.addEventListener("click", () => {
+    if (currentSectionIndex < currentExam.sections.length - 1)
+      showSection(currentSectionIndex + 1);
   });
 
   submitButton.addEventListener("click", gradeCurrentScope);
@@ -247,11 +276,13 @@ function attachHandlers() {
     saveProgressBtn.textContent = "Saved ✓";
     setTimeout(() => {
       saveProgressBtn.textContent = original;
-    }, 1200);
+    }, 1100);
   });
 }
 
-// ==================== GRADING ====================
+/*****************************************************
+ * GRADING
+ *****************************************************/
 function gradeCurrentScope() {
   if (!currentExam) return;
 
@@ -267,8 +298,7 @@ function gradeCurrentScope() {
   sections.forEach(sec => {
     sec.questions.forEach(q => {
       total++;
-      const chosen = answers[q.id];
-      if (chosen && chosen === q.answer) correct++;
+      if (answers[q.id] === q.answer) correct++;
     });
   });
 
@@ -277,11 +307,10 @@ function gradeCurrentScope() {
   const pct = Math.round((correct / total) * 100);
   scorePercentEl.textContent = pct + "%";
   scoreSummaryEl.textContent = `${correct} / ${total} correct`;
-  scorePercentEl.style.color = pct >= 90 ? "var(--success)" : "var(--danger)";
+  scorePercentEl.style.color =
+    pct >= 90 ? "var(--success)" : "var(--danger)";
 
-  // Highlight questions only in current visible section
   markCurrentSection();
-
   exportButtons.style.display = "flex";
 }
 
@@ -290,6 +319,7 @@ function markCurrentSection() {
 
   questions.forEach(qDiv => {
     qDiv.classList.remove("unanswered");
+
     const qid = qDiv.dataset.qid;
     const correctAns = qDiv.dataset.answer;
     const chosen = answers[qid];
@@ -297,23 +327,24 @@ function markCurrentSection() {
     const labels = qDiv.querySelectorAll("label");
     labels.forEach(label => {
       label.classList.remove("opt-correct", "opt-incorrect-selected");
+
       const input = label.querySelector("input");
       if (!input) return;
-      if (input.value === correctAns) {
+
+      if (input.value === correctAns)
         label.classList.add("opt-correct");
-      }
-      if (chosen && input.value === chosen && chosen !== correctAns) {
+
+      if (chosen && input.value === chosen && chosen !== correctAns)
         label.classList.add("opt-incorrect-selected");
-      }
     });
 
-    if (!chosen) {
-      qDiv.classList.add("unanswered");
-    }
+    if (!chosen) qDiv.classList.add("unanswered");
   });
 }
 
-// ==================== SAVE / LOAD PROGRESS ====================
+/*****************************************************
+ * SAVE / LOAD PROGRESS
+ *****************************************************/
 function saveProgress() {
   if (!currentExam) return;
 
@@ -333,6 +364,7 @@ function loadProgress() {
 
   try {
     const data = JSON.parse(raw);
+
     if (!data.examId) return false;
 
     pendingRestore = {
@@ -345,113 +377,112 @@ function loadProgress() {
 
     examSelect.value = pendingRestore.examId;
     modeSelect.value = pendingRestore.mode;
+
     loadExam(pendingRestore.examId);
     return true;
   } catch (e) {
-    console.error("Failed to load progress:", e);
+    console.error("ERROR restoring progress:", e);
     return false;
   }
 }
 
-// ==================== EXPORT RESULTS ====================
+/*****************************************************
+ * EXPORT RESULTS (FULL TEXT VERSION)
+ *****************************************************/
 function buildExportScope(onlyIncorrect) {
   const mode = modeSelect.value;
-  const sections =
-    mode === "full"
-      ? currentExam.sections
-      : [currentExam.sections[currentSectionIndex]];
-
-  return { mode, sections, onlyIncorrect };
+  return {
+    mode,
+    sections:
+      mode === "full"
+        ? currentExam.sections
+        : [currentExam.sections[currentSectionIndex]],
+    onlyIncorrect
+  };
 }
 
 function generateResultHTML(onlyIncorrect) {
   const scope = buildExportScope(onlyIncorrect);
-  const mode = scope.mode;
-  const sections = scope.sections;
+  const { mode, sections } = scope;
 
   let title = currentExam.title;
-  if (mode === "single") {
-    title += " – " + sections[0].title;
-  }
+  if (mode === "single") title += " – " + sections[0].title;
 
-  const passColour = "#22c55e";
-  const failColour = "#f97373";
-  const neutral = "#64748b";
+  const green = "#22c55e";
+  const red = "#f97373";
+  const gray = "#64748b";
 
-  let html = `<!DOCTYPE html>
+  let html = `
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>${title} – Results</title>
 <style>
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
-  padding: 24px;
-}
-h1 {
-  margin-top: 0;
-}
-.section {
-  margin-bottom: 24px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #020617;
-  border: 1px solid #1f2933;
-}
-.q {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px dashed #1f2937;
-}
-.q:last-child {
-  border-bottom: none;
-}
-.status {
-  font-weight: 600;
-}
-.status.correct { color: ${passColour}; }
-.status.incorrect { color: ${failColour}; }
-.status.unanswered { color: ${neutral}; }
-.small {
-  font-size: 0.85rem;
-  color: #9ca3af;
-}
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 24px;
+  }
+  h1 { margin-top: 0; }
+  .section {
+    margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #020617;
+    border: 1px solid #1f2937;
+  }
+  .q {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #334155;
+  }
+  .q:last-child { border-bottom: none; }
+  .status { font-weight: 700; }
+  .correct { color: ${green}; }
+  .incorrect { color: ${red}; }
+  .unanswered { color: ${gray}; }
 </style>
 </head>
 <body>
 <h1>${title} – Results</h1>
-<p class="small">Correct answers in green, incorrect in red.</p>
+<p style="color:#94a3b8">Correct answers are shown in green; incorrect in red.</p>
 `;
 
   sections.forEach(section => {
     html += `<div class="section"><h2>${section.title}</h2>`;
+
     section.questions.forEach(q => {
       const chosen = answers[q.id] || null;
       const correct = q.answer;
+      const chosenText = chosen ? `${chosen}) ${q.options[chosen]}` : "(none)";
+      const correctText = `${correct}) ${q.options[correct]}`;
       const isCorrect = chosen === correct;
       const isAnswered = !!chosen;
 
       if (onlyIncorrect && (isCorrect || !isAnswered)) return;
 
-      let statusClass = "unanswered";
-      let statusLabel = "Unanswered";
       if (isCorrect) {
-        statusClass = "correct";
-        statusLabel = "Correct";
-      } else if (isAnswered) {
-        statusClass = "incorrect";
-        statusLabel = "Incorrect";
-      }
-
-      html += `<div class="q">
+        html += `
+<div class="q">
   <p><strong>Q:</strong> ${q.text}</p>
-  <p><strong>Your answer:</strong> ${chosen || "(none)"}<br>
-     <strong>Correct answer:</strong> ${correct}</p>
-  <p class="status ${statusClass}">${statusLabel}</p>
-</div>`;
+  <p><strong>Your Answer:</strong> ${chosenText}</p>
+  <p class="status correct">Correct ✓</p>
+</div>
+`;
+      } else {
+        html += `
+<div class="q">
+  <p><strong>Q:</strong> ${q.text}</p>
+  <p><strong>Your Answer:</strong> ${chosenText}</p>
+  <p><strong>Correct Answer:</strong> ${correctText}</p>
+  <p class="status incorrect">Incorrect ✘</p>
+</div>
+`;
+      }
     });
+
     html += `</div>`;
   });
 
@@ -460,23 +491,21 @@ h1 {
 }
 
 function downloadResults(onlyIncorrect) {
-  if (!currentExam) return;
-  const mode = modeSelect.value;
   const html = generateResultHTML(onlyIncorrect);
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
-  const base =
-    mode === "full" ? "exam" : `section-${currentSectionIndex + 1}`;
+  const prefix = modeSelect.value === "full" ? "exam" : `section-${currentSectionIndex + 1}`;
+
   a.href = url;
   a.download = onlyIncorrect
-    ? `${base}-incorrect.html`
-    : `${base}-full.html`;
+    ? `${prefix}-incorrect.html`
+    : `${prefix}-full.html`;
+
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-    a.remove();
-  }, 0);
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
