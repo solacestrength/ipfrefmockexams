@@ -13,15 +13,17 @@ const exportFullBtn = document.getElementById("exportFull");
 const exportWrongBtn = document.getElementById("exportWrong");
 const submitButton = document.getElementById("submitButton");
 const themeToggle = document.getElementById("themeToggle");
+const saveProgressBtn = document.getElementById("saveProgressBtn");
 
 let currentExam = null;
 let currentExamScript = null;
 let currentSectionIndex = 0;
 let answers = {}; // { questionId: "A" | "B" | ... }
+let pendingRestore = null;
 
-// -------------------- Theme --------------------
+// ==================== THEME ====================
 function applySavedTheme() {
-  const saved = localStorage.getItem("theme") || "dark";
+  const saved = localStorage.getItem("theme") || "light";
   if (saved === "dark") {
     document.body.classList.add("dark");
   } else {
@@ -41,17 +43,21 @@ themeToggle.addEventListener("click", () => {
   updateThemeToggleLabel();
 });
 
-// -------------------- Exam loading --------------------
+// ==================== DOM READY ====================
 window.addEventListener("DOMContentLoaded", () => {
   applySavedTheme();
   populateExamDropdown();
   attachHandlers();
-  // Load first exam
-  if (window.examList && window.examList.length > 0) {
-    loadExam(window.examList[0].id);
+
+  // Try restoring progress; if none, load first exam
+  if (!loadProgress()) {
+    if (window.examList && window.examList.length > 0) {
+      loadExam(window.examList[0].id);
+    }
   }
 });
 
+// ==================== EXAM LOADING ====================
 function populateExamDropdown() {
   examSelect.innerHTML = "";
   window.examList.forEach(exam => {
@@ -72,23 +78,36 @@ function loadExam(examId) {
     currentExamScript = null;
   }
 
-  // Reset UI
-  answers = {};
+  // Reset UI state
   currentExam = null;
   sectionsContainer.innerHTML = "";
   scorePercentEl.textContent = "–%";
   scoreSummaryEl.textContent = "";
   exportButtons.style.display = "none";
 
-  // Load script
+  // Answers remain; they might be restored
+
   const s = document.createElement("script");
   s.src = "js/" + info.file;
   s.onload = () => {
     currentExam = window.examData;
-    currentSectionIndex = 0;
-    populateSectionDropdown(currentExam);
-    showSection(0);
-    updateModeUI();
+    // If we have pending restore for this exam, apply it
+    if (pendingRestore && pendingRestore.examId === examId) {
+      modeSelect.value = pendingRestore.mode || "full";
+      currentSectionIndex = pendingRestore.sectionIndex || 0;
+      answers = pendingRestore.answers || {};
+      populateSectionDropdown(currentExam);
+      showSection(currentSectionIndex);
+      updateModeUI();
+      pendingRestore = null;
+    } else {
+      // Default fresh exam
+      answers = {};
+      currentSectionIndex = 0;
+      populateSectionDropdown(currentExam);
+      showSection(0);
+      updateModeUI();
+    }
   };
   document.body.appendChild(s);
   currentExamScript = s;
@@ -99,12 +118,12 @@ function populateSectionDropdown(exam) {
   exam.sections.forEach((sec, idx) => {
     const o = document.createElement("option");
     o.value = idx;
-    o.textContent = `${idx + 1}. ${sec.title}`;
+    o.textContent = sec.title; // no duplicated numbers
     sectionSelect.appendChild(o);
   });
 }
 
-// -------------------- Rendering --------------------
+// ==================== RENDERING ====================
 function showSection(index) {
   if (!currentExam) return;
   currentSectionIndex = index;
@@ -114,6 +133,8 @@ function showSection(index) {
   const section = currentExam.sections[index];
   renderSection(section);
   updateProgressBar();
+  saveProgress();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderSection(section) {
@@ -133,7 +154,7 @@ function renderSection(section) {
     const optionsHtml = Object.keys(q.options)
       .map(letter => {
         const checked =
-          answers[q.id] && answers[q.id] === letter ? 'checked' : '';
+          answers[q.id] && answers[q.id] === letter ? "checked" : "";
         return `
           <label>
             <input type="radio" name="${q.id}" value="${letter}" ${checked}>
@@ -148,10 +169,10 @@ function renderSection(section) {
       ${optionsHtml}
     `;
 
-    // Attach change listeners
     qDiv.querySelectorAll('input[type="radio"]').forEach(input => {
       input.addEventListener("change", () => {
         answers[q.id] = input.value;
+        saveProgress();
       });
     });
 
@@ -161,9 +182,14 @@ function renderSection(section) {
   sectionsContainer.appendChild(card);
 }
 
-// -------------------- Navigation, mode, progress --------------------
+// ==================== NAVIGATION & MODE ====================
 function updateProgressBar() {
   const mode = modeSelect.value;
+  if (!currentExam) {
+    progressContainer.style.display = "none";
+    return;
+  }
+
   if (mode === "single") {
     progressContainer.style.display = "none";
     return;
@@ -177,7 +203,6 @@ function updateProgressBar() {
 function updateModeUI() {
   const mode = modeSelect.value;
   submitButton.textContent = mode === "full" ? "Mark Exam" : "Mark Section";
-
   const disabled = mode === "single";
   prevSectionBtn.disabled = disabled;
   nextSectionBtn.disabled = disabled;
@@ -185,10 +210,14 @@ function updateModeUI() {
 }
 
 function attachHandlers() {
-  examSelect.addEventListener("change", () => loadExam(examSelect.value));
+  examSelect.addEventListener("change", () => {
+    loadExam(examSelect.value);
+    // When switching exams, we will save progress for new exam when answers are changed
+  });
 
   modeSelect.addEventListener("change", () => {
     updateModeUI();
+    saveProgress();
   });
 
   sectionSelect.addEventListener("change", e => {
@@ -211,9 +240,18 @@ function attachHandlers() {
 
   exportFullBtn.addEventListener("click", () => downloadResults(false));
   exportWrongBtn.addEventListener("click", () => downloadResults(true));
+
+  saveProgressBtn.addEventListener("click", () => {
+    saveProgress();
+    const original = saveProgressBtn.textContent;
+    saveProgressBtn.textContent = "Saved ✓";
+    setTimeout(() => {
+      saveProgressBtn.textContent = original;
+    }, 1200);
+  });
 }
 
-// -------------------- Grading --------------------
+// ==================== GRADING ====================
 function gradeCurrentScope() {
   if (!currentExam) return;
 
@@ -241,15 +279,14 @@ function gradeCurrentScope() {
   scoreSummaryEl.textContent = `${correct} / ${total} correct`;
   scorePercentEl.style.color = pct >= 90 ? "var(--success)" : "var(--danger)";
 
-  // Highlight current section questions
+  // Highlight questions only in current visible section
   markCurrentSection();
 
   exportButtons.style.display = "flex";
 }
 
 function markCurrentSection() {
-  const card = sectionsContainer;
-  const questions = card.querySelectorAll(".question");
+  const questions = sectionsContainer.querySelectorAll(".question");
 
   questions.forEach(qDiv => {
     qDiv.classList.remove("unanswered");
@@ -259,10 +296,7 @@ function markCurrentSection() {
 
     const labels = qDiv.querySelectorAll("label");
     labels.forEach(label => {
-      label.classList.remove(
-        "opt-correct",
-        "opt-incorrect-selected"
-      );
+      label.classList.remove("opt-correct", "opt-incorrect-selected");
       const input = label.querySelector("input");
       if (!input) return;
       if (input.value === correctAns) {
@@ -279,7 +313,47 @@ function markCurrentSection() {
   });
 }
 
-// -------------------- Export results --------------------
+// ==================== SAVE / LOAD PROGRESS ====================
+function saveProgress() {
+  if (!currentExam) return;
+
+  const data = {
+    examId: examSelect.value,
+    mode: modeSelect.value,
+    sectionIndex: currentSectionIndex,
+    answers: answers
+  };
+
+  localStorage.setItem("examProgress", JSON.stringify(data));
+}
+
+function loadProgress() {
+  const raw = localStorage.getItem("examProgress");
+  if (!raw) return false;
+
+  try {
+    const data = JSON.parse(raw);
+    if (!data.examId) return false;
+
+    pendingRestore = {
+      examId: data.examId,
+      mode: data.mode || "full",
+      sectionIndex:
+        typeof data.sectionIndex === "number" ? data.sectionIndex : 0,
+      answers: data.answers || {}
+    };
+
+    examSelect.value = pendingRestore.examId;
+    modeSelect.value = pendingRestore.mode;
+    loadExam(pendingRestore.examId);
+    return true;
+  } catch (e) {
+    console.error("Failed to load progress:", e);
+    return false;
+  }
+}
+
+// ==================== EXPORT RESULTS ====================
 function buildExportScope(onlyIncorrect) {
   const mode = modeSelect.value;
   const sections =
