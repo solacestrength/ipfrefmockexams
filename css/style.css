@@ -66,6 +66,29 @@ body.dark .theme-toggle:hover {
   background: #273549;
 }
 
+/* === DARK MODE: Dropdown === */
+body.dark select,
+body.dark .exam-select,
+body.dark #examSelect {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #2a3441;
+}
+
+/* Fix dropdown arrow colour on iOS/Safari */
+body.dark select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #e2e8f0 50%),
+    linear-gradient(135deg, #e2e8f0 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) calc(50% - 6px),
+    calc(100% - 15px) calc(50% - 6px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
 /* ==== Header ==== */
 h1 {
   margin: 0 0 12px 0;
@@ -91,6 +114,11 @@ select {
 
 select:hover {
   border-color: var(--accent);
+}
+
+body.dark header h1,
+body.dark header p {
+  color: #f1f5f9;
 }
 
 /* ==== Layout ==== */
