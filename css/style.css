@@ -281,6 +281,12 @@ body.dark .theme-toggle {
   color: var(--text-subtle);
 }
 
+.bottom-nav {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
 /* ===== Results & buttons ===== */
 .results-panel {
   margin-top: 20px;
