@@ -1,0 +1,208 @@
+/* ===== Light Theme ===== */
+:root {
+  --bg: #f7f9fc;
+  --bg-card: #ffffff;
+  --border: #d4dce7;
+  --text-main: #1e293b;
+  --text-subtle: #64748b;
+  --accent: #1d9bf0;
+  --accent-light: #e0f2ff;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.08);
+  --success: #16a34a;
+  --danger: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+}
+
+/* ==== Outer Shell ==== */
+.app-shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  padding: 32px 30px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+}
+
+/* ==== Header ==== */
+h1 {
+  margin: 0 0 12px 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+label {
+  font-size: 0.9rem;
+  color: var(--text-subtle);
+  display: block;
+  margin-bottom: 6px;
+}
+
+select {
+  padding: 10px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+}
+
+select:hover {
+  border-color: var(--accent);
+}
+
+/* ==== Layout ==== */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 0.45fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==== Exam Card ==== */
+.exam-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  max-height: 78vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Scrollbar (light + subtle) */
+.exam-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.exam-card::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+/* ==== Section Card ==== */
+.section-card {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: white;
+  margin-bottom: 16px;
+}
+
+.section-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+/* ==== Questions ==== */
+.question {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+  margin-bottom: 14px;
+}
+
+.question:hover {
+  background: #f1f5f9;
+  border-color: var(--border);
+}
+
+.question p {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+label {
+  font-size: 0.9rem;
+  display: block;
+  padding: 4px 0;
+}
+
+input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+/* Correct/Incorrect styles */
+.question.correct {
+  background: #ecfdf5;
+  border-color: #86efac;
+}
+
+.question.incorrect {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+/* ==== Sidebar ==== */
+.side-card {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+.side-card h2 {
+  margin-top: 0;
+}
+
+/* Score text */
+#scorePercent {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+#scoreSummary {
+  font-size: 0.95rem;
+  color: var(--text-subtle);
+}
+
+/* ==== Button ==== */
+#submitButton {
+  margin-top: 20px;
+  padding: 12px 20px;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  box-shadow: var(--shadow-soft);
+  transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+#submitButton:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+#submitButton:active {
+  transform: translateY(0);
+}
