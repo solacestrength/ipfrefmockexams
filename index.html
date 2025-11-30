@@ -46,23 +46,28 @@
     <main class="app-main">
       <div id="sectionsContainer"></div>
 
+      <!-- Bottom navigation ABOVE results panel -->
+      <div class="section-nav bottom-nav">
+        <button id="prevSectionBottom" class="nav-btn">← Previous</button>
+        <button id="nextSectionBottom" class="nav-btn">Next →</button>
+      </div>
+
       <div class="results-panel">
         <div class="score-display">
           <span id="scorePercent" class="score-percent">–%</span>
           <span id="scoreSummary" class="score-summary"></span>
         </div>
+
         <button id="submitButton" class="primary-btn">Mark Exam</button>
         <button id="saveProgressBtn" class="secondary-btn">Save Progress</button>
+        <button id="resetSectionBtn" class="secondary-btn warn-btn">Reset Section</button>
+        <button id="clearProgressBtn" class="danger-btn">Clear Progress</button>
       </div>
 
       <div id="exportButtons" class="export-buttons" style="display:none;">
         <button id="exportFull" class="export-btn">Download Full Results</button>
         <button id="exportWrong" class="export-btn">Download Incorrect Only</button>
       </div>
-      <div class="section-nav bottom-nav">
-  <button id="prevSectionBottom" class="nav-btn">← Previous</button>
-  <button id="nextSectionBottom" class="nav-btn">Next →</button>
-</div>
     </main>
   </div>
 
