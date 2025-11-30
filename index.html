@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IPF Technical Rules – Mock Exams</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-elevated: #111827;
+      --bg-card: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --accent-strong: rgba(56, 189, 248, 0.3);
+      --text-main: #e5e7eb;
+      --text-subtle: #9ca3af;
+      --danger: #f97373;
+      --success: #22c55e;
+      --border-subtle: #1f2933;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+      --shadow-inner: inset 0 0 0 1px rgba(148, 163, 184, 0.06);
+      --transition-fast: 150ms ease-out;
+      --transition-med: 220ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+      padding: 24px;
+    }
+
+    .app-shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(15,23,42,0.96));
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      padding: 24px 20px 28px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      backdrop-filter: blur(20px);
+    }
+
+    @media (min-width: 768px) {
+      .app-shell {
+        padding: 28px 32px 32px;
+      }
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .title {
+      font-size: 1.15rem;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-pill {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 2px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-subtle);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bolt-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #f97316, #ea580c);
+      box-shadow: 0 0 12px rgba(248, 113, 113, 0.7);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-subtle);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .select-wrap {
+      position: relative;
+      min-width: 190px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-subtle);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 34px 8px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: radial-gradient(circle at top, #020617, #020617);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast),
+        background var(--transition-fast);
+    }
+
+    select:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+      transform: translateY(-0.5px);
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 10px;
+      top: 58%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+    }
+
+    .badge-pass-threshold {
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #bbf7d0;
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.18), rgba(22,163,74,0.04));
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-pass-threshold span {
+      font-weight: 600;
+    }
+
+    .threshold-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #22c55e, #15803d);
+      box-shadow: 0 0 8px rgba(22, 163, 74, 0.9);
+    }
+
+    /* Body content */
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.55fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .exam-card {
+      background: radial-gradient(circle at top left, #0b1120, #020617);
+      border-radius: var(--radius-lg);
+      padding: 16px 14px 18px;
+      box-shadow: var(--shadow-inner);
+      border: 1px solid var(--border-subtle);
+      max-height: 75vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sections-scroll {
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-right: -4px;
+      margin-top: 4px;
+    }
+
+    .sections-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+    .sections-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sections-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 999px;
+    }
+
+    .section-card {
+      border-radius: var(--radius-md);
+      padding: 10px 11px 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      margin-bottom: 10px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .section-meta {
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+    }
+
+    .question {
+      margin: 7px 0 9px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .question:hover {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .question-text {
+      font-size: 0.86rem;
+      margin-bottom: 6px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    @media (max-width: 640px) {
+      .options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      padding: 4px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast),
+        box-shadow var(--transition-fast), border-color var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .option input {
+      accent-color: var(--accent);
+    }
+
+    .option:hover {
+      background: rgba(15, 23, 42, 0.92);
+      border-color: rgba(148, 163, 184, 0.4);
+      transform: translateY(-0.5px);
+    }
+
+    .question.correct {
+      border-color: rgba(34, 197, 94, 0.7);
+      background: radial-gradient(circle at top left, rgba(21,128,61,0.25), rgba(15,23,42,0.95));
+    }
+
+    .question.incorrect {
+      border-color: rgba(248, 113, 113, 0.7);
+      background: radial-gradient(circle at top left, rgba(185,28,28,0.2), rgba(15,23,42,0.95));
+    }
+
+    .feedback {
+      font-size: 0.78rem;
+      margin-top: 3px;
+    }
+
+    .feedback.correct {
+      color: #bbf7d0;
+    }
+
+    .feedback.incorrect {
+      color: #fecaca;
+    }
+
+    .question-footer {
+      font-size: 0.74rem;
+      color: var(--text-subtle);
+      margin-top: 3px;
+    }
+
+    /* Sidebar / results */
+
+    .side-card {
+      background: radial-gradient(circle at top left, #020617, #020617);
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 16px;
+      box-shadow: var(--shadow-inner);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: fit-content;
+    }
+
+    .side-heading {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-subtle);
+    }
+
+    .button-primary {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 9px 16px;
+      background: radial-gradient(circle at 20% 0%, #38bdf8, #0369a1);
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 10px 30px rgba(8, 47, 73, 0.8);
+      transition: transform var(--transition-med), box-shadow var(--transition-med),
+        filter var(--transition-med);
+      width: 100%;
+    }
+
+    .button-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(8, 47, 73, 0.95);
+      filter: brightness(1.05);
+    }
+
+    .button-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 22px rgba(8, 47, 73, 0.7);
+      filter: brightness(0.98);
+    }
+
+    .tiny-caption {
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+    }
+
+    .score-chip {
+      border-radius: var(--radius-lg);
+      padding: 8px 10px;
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.8), #020617);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .score-main {
+      font-size: 1.4rem;
+      font-weight: 650;
+    }
+
+    .score-sub {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+    }
+
+    .status-pill {
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pass {
+      background: rgba(22, 163, 74, 0.16);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.8);
+    }
+
+    .status-fail {
+      background: rgba(248, 113, 113, 0.16);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.8);
+    }
+
+    .result-details {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pill-label {
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+    }
+
+    .pill-value {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .help-text {
+      font-size: 0.74rem;
+      color: var(--text-subtle);
+      margin-top: 2px;
+    }
+
+    .hint {
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+      margin-top: 4px;
+    }
+
+    .accent-chip {
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-strong);
+      font-size: 0.74rem;
+      color: #e0f2fe;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="title-block">
+        <div class="title">
+          IPF Technical Rules – Mock Exams
+          <span class="title-pill">
+            <span class="bolt-dot"></span>
+            Multi–Exam Trainer
+          </span>
+        </div>
+        <div class="subtitle">
+          Toggle between exam versions, answer all questions, then submit to see if you reach the
+          <strong>90% pass mark</strong>.
+        </div>
+      </div>
+      <div class="controls">
+        <div>
+          <div class="badge-pass-threshold">
+            <span class="threshold-dot"></span>
+            <span>Pass: 90%+</span>
+          </div>
+        </div>
+        <div class="select-wrap">
+          <label for="examSelect">Exam Version</label>
+          <select id="examSelect">
+            <option value="exam1">Exam 1 – Core IPF Rules</option>
+            <option value="exam2">Exam 2 – Variant A (placeholder)</option>
+            <option value="exam3">Exam 3 – Variant B (placeholder)</option>
+            <option value="exam4">Exam 4 – Variant C (placeholder)</option>
+            <option value="exam5">Exam 5 – Variant D (placeholder)</option>
+            <option value="exam6">Exam 6 – Variant E (placeholder)</option>
+            <option value="exam7">Exam 7 – Variant F (placeholder)</option>
+          </select>
+          <div class="select-arrow">▾</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <form id="examForm" class="exam-card">
+        <div class="accent-chip">
+          <span>📚</span> One full exam = all sections. All answers are single–choice (A–D).
+        </div>
+        <div class="hint">
+          Tip: you can re–submit the same exam after changing answers. Questions will be marked green/red.
+        </div>
+        <div id="sectionsContainer" class="sections-scroll">
+          <!-- Sections and questions will be injected here -->
+        </div>
+      </form>
+
+      <aside class="side-card">
+        <div class="side-heading">Exam Result</div>
+        <div class="score-chip">
+          <div>
+            <div class="score-main" id="scorePercent">–%</div>
+            <div class="score-sub" id="scoreSummary">Answer questions & submit to see your score.</div>
+          </div>
+          <div id="statusPill" class="status-pill" style="visibility:hidden;"></div>
+        </div>
+
+        <div class="result-details">
+          <div class="pill">
+            <span class="pill-label">Correct</span>
+            <span class="pill-value" id="correctCount">0</span>
+          </div>
+          <div class="pill">
+            <span class="pill-label">Total questions</span>
+            <span class="pill-value" id="totalCount">0</span>
+          </div>
+          <div class="pill">
+            <span class="pill-label">Pass mark</span>
+            <span class="pill-value">90%</span>
+          </div>
+          <div class="pill">
+            <span class="pill-label">Current exam</span>
+            <span class="pill-value" id="currentExamLabel">Exam 1</span>
+          </div>
+        </div>
+
+        <button type="button" class="button-primary" id="submitButton">
+          <span>Mark Exam</span> <span>➜</span>
+        </button>
+        <div class="tiny-caption">
+          Your answers are checked entirely in your browser – nothing is sent anywhere.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIGURATION: DEFINE YOUR EXAMS & QUESTIONS HERE =====
+
+    // Pass threshold (0.90 => 90%)
+    const PASS_THRESHOLD = 0.9;
+
+    // Data model:
+    // exams = {
+    //   examId: {
+    //     title: "Exam X – ...",
+    //     sections: [
+    //       {
+    //         id: "section_key",
+    //         title: "1. Section title",
+    //         questions: [
+    //           {
+    //             id: "unique_question_id",
+    //             text: "Question text ...",
+    //             options: {
+    //               A: "Option A",
+    //               B: "Option B",
+    //               C: "Option C",
+    //               D: "Option D"
+    //             },
+    //             answer: "C", // correct letter
+    //             note: "Optional: rule reference or comment"
+    //           }
+    //         ]
+    //       }
+    //     ]
+    //   }
+    // };
+
+    const exams = {
+      exam1: {
+        title: "Exam 1 – Core IPF Rules",
+        sections: [
+          // 1. General Rules of Powerlifting
+          {
+            id: "general_rules",
+            title: "1. General Rules of Powerlifting",
+            questions: [
+              {
+                id: "gr1",
+                text: "Which of the following is NOT one of the three official IPF powerlifts?",
+                options: {
+                  A: "Squat",
+                  B: "Bench Press",
+                  C: "Deadlift",
+                  D: "Clean & Jerk"
+                },
+                answer: "D",
+                note: "Only Squat, Bench Press, and Deadlift are official powerlifts."
+              },
+              {
+                id: "gr2",
+                text: "How many attempts is each lifter allowed on each lift in an IPF competition?",
+                options: {
+                  A: "2",
+                  B: "3",
+                  C: "4",
+                  D: "Unlimited, until failure"
+                },
+                answer: "B",
+                note: "Each lifter is allowed 3 attempts per discipline."
+              },
+              {
+                id: "gr3",
+                text: "If two lifters finish with the same total, who ranks higher?",
+                options: {
+                  A: "The older lifter",
+                  B: "The lighter lifter",
+                  C: "The heavier lifter",
+                  D: "The lifter from the host nation"
+                },
+                answer: "B",
+                note: "Ties are broken in favour of the lighter lifter."
+              },
+              {
+                id: "gr4",
+                text: "Which age group may compete in the Open category?",
+                options: {
+                  A: "From the calendar year they turn 14",
+                  B: "Only exactly 19 years old",
+                  C: "From 1 January of the year they turn 19 and upwards",
+                  D: "From 1 January of the year they turn 23 and upwards"
+                },
+                answer: "C",
+                note: "Open begins in the year the lifter turns 19."
+              },
+              {
+                id: "gr5",
+                text: "How many Master age divisions exist for men and women?",
+                options: {
+                  A: "2",
+                  B: "3",
+                  C: "4",
+                  D: "5"
+                },
+                answer: "C",
+                note: "Master I, II, III, and IV."
+              }
+            ]
+          },
+
+          // 2. Age & Bodyweight Categories
+          {
+            id: "age_bodyweight",
+            title: "2. Age & Bodyweight Categories",
+            questions: [
+              {
+                id: "ab1",
+                text: "The Junior category covers which age span?",
+                options: {
+                  A: "14–18",
+                  B: "19–23",
+                  C: "24–39",
+                  D: "40–49"
+                },
+                answer: "B",
+                note: "Junior: from 1 January of the year they turn 19 to the end of the year they turn 23."
+              },
+              {
+                id: "ab2",
+                text: "Master II begins on 1 January of the year the lifter turns:",
+                options: {
+                  A: "40",
+                  B: "45",
+                  C: "50",
+                  D: "55"
+                },
+                answer: "C",
+                note: "Master II is 50–59."
+              },
+              {
+                id: "ab3",
+                text: "The men's 83.0 kg class includes bodyweights from:",
+                options: {
+                  A: "Up to 83.0 kg exactly",
+                  B: "66.01–74.0 kg",
+                  C: "74.01–83.0 kg",
+                  D: "83.01–93.0 kg"
+                },
+                answer: "C",
+                note: "83.0 kg class is 74.01–83.0 kg."
+              },
+              {
+                id: "ab4",
+                text: "At most, how many competitors from one nation may enter a single bodyweight category?",
+                options: {
+                  A: "1",
+                  B: "2",
+                  C: "3",
+                  D: "No limit"
+                },
+                answer: "B",
+                note: "Maximum of 2 lifters per nation in any one class."
+              }
+            ]
+          },
+
+          // 3. Equipment & Specifications (sample subset)
+          {
+            id: "equipment_specs",
+            title: "3. Equipment & Specifications",
+            questions: [
+              {
+                id: "eq1",
+                text: "What is the allowed diameter range for an IPF-approved barbell shaft?",
+                options: {
+                  A: "25–28 mm",
+                  B: "28–29 mm",
+                  C: "29–32 mm",
+                  D: "30–32 mm"
+                },
+                answer: "B",
+                note: "Bar diameter must be between 28 mm and 29 mm."
+              },
+              {
+                id: "eq2",
+                text: "The total weight of the bar and collars combined must be:",
+                options: {
+                  A: "20 kg",
+                  B: "22.5 kg",
+                  C: "25 kg",
+                  D: "27.5 kg"
+                },
+                answer: "C",
+                note: "Bar plus collars = 25 kg."
+              },
+              {
+                id: "eq3",
+                text: "The platform surface must:",
+                options: {
+                  A: "Be rubber matting",
+                  B: "Be covered in non-slip smooth carpet",
+                  C: "Have a raised lip at the edges",
+                  D: "Be at least 20 cm above the floor"
+                },
+                answer: "B",
+                note: "Platform must be flat, firm, level, and covered with non-slip smooth carpet."
+              }
+            ]
+          },
+
+          // 4. Personal Equipment (sample subset)
+          {
+            id: "personal_equipment",
+            title: "4. Personal Equipment",
+            questions: [
+              {
+                id: "pe1",
+                text: "In Classic (Raw) competitions, which type of suit is permitted?",
+                options: {
+                  A: "Supportive suit only",
+                  B: "Non-supportive suit only",
+                  C: "Any supportive or non-supportive suit",
+                  D: "No suit required"
+                },
+                answer: "B",
+                note: "Classic/Raw requires a non-supportive lifting suit."
+              },
+              {
+                id: "pe2",
+                text: "Where must the belt be worn if used?",
+                options: {
+                  A: "Over the t-shirt but under the suit",
+                  B: "Directly on the skin",
+                  C: "Over the lifting suit",
+                  D: "It can be worn anywhere"
+                },
+                answer: "C",
+                note: "Belt must be worn on the outside of the lifting suit."
+              }
+            ]
+          }
+
+          // You can continue adding sections up to 15 here,
+          // staying under 10 questions per section.
+        ]
+      },
+
+      // Placeholder exams 2–7 so you can later fill with alternative questions
+      exam2: {
+        title: "Exam 2 – Variant A (placeholder)",
+        sections: []
+      },
+      exam3: {
+        title: "Exam 3 – Variant B (placeholder)",
+        sections: []
+      },
+      exam4: {
+        title: "Exam 4 – Variant C (placeholder)",
+        sections: []
+      },
+      exam5: {
+        title: "Exam 5 – Variant D (placeholder)",
+        sections: []
+      },
+      exam6: {
+        title: "Exam 6 – Variant E (placeholder)",
+        sections: []
+      },
+      exam7: {
+        title: "Exam 7 – Variant F (placeholder)",
+        sections: []
+      }
+    };
+
+    // ===== RENDERING LOGIC =====
+
+    const examSelect = document.getElementById("examSelect");
+    const sectionsContainer = document.getElementById("sectionsContainer");
+    const examForm = document.getElementById("examForm");
+    const submitButton = document.getElementById("submitButton");
+
+    const scorePercentEl = document.getElementById("scorePercent");
+    const scoreSummaryEl = document.getElementById("scoreSummary");
+    const correctCountEl = document.getElementById("correctCount");
+    const totalCountEl = document.getElementById("totalCount");
+    const statusPillEl = document.getElementById("statusPill");
+    const currentExamLabelEl = document.getElementById("currentExamLabel");
+
+    function renderExam(examId) {
+      const exam = exams[examId];
+      sectionsContainer.innerHTML = "";
+
+      if (!exam || !exam.sections || exam.sections.length === 0) {
+        const msg = document.createElement("p");
+        msg.textContent =
+          "This exam version has not been populated with questions yet. Add sections and questions in the JavaScript 'exams' object.";
+        msg.style.fontSize = "0.84rem";
+        msg.style.color = "#9ca3af";
+        msg.style.marginTop = "10px";
+        sectionsContainer.appendChild(msg);
+        updateTotals(0, 0);
+        resetScoreDisplay();
+        currentExamLabelEl.textContent = exam?.title || examId;
+        return;
+      }
+
+      let totalQuestions = 0;
+
+      exam.sections.forEach((section, sectionIndex) => {
+        const sectionCard = document.createElement("div");
+        sectionCard.className = "section-card";
+
+        const sectionHeader = document.createElement("div");
+        sectionHeader.className = "section-header";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "section-title";
+        titleEl.textContent = section.title;
+
+        const metaEl = document.createElement("div");
+        metaEl.className = "section-meta";
+        const qCount = section.questions.length;
+        metaEl.textContent = `${qCount} question${qCount !== 1 ? "s" : ""}`;
+
+        sectionHeader.appendChild(titleEl);
+        sectionHeader.appendChild(metaEl);
+        sectionCard.appendChild(sectionHeader);
+
+        section.questions.forEach((q, qIndex) => {
+          totalQuestions++;
+          const questionEl = document.createElement("div");
+          questionEl.className = "question";
+          questionEl.dataset.questionId = q.id;
+          questionEl.dataset.correctAnswer = q.answer;
+
+          const qText = document.createElement("div");
+          qText.className = "question-text";
+          qText.textContent = `${sectionIndex + 1}.${qIndex + 1} ${q.text}`;
+          questionEl.appendChild(qText);
+
+          const optsContainer = document.createElement("div");
+          optsContainer.className = "options";
+
+          ["A", "B", "C", "D"].forEach((letter) => {
+            if (!q.options[letter]) return;
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            const name = `${examId}__${q.id}`;
+            input.name = name;
+            input.value = letter;
+
+            const span = document.createElement("span");
+            span.textContent = `${letter}) ${q.options[letter]}`;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optsContainer.appendChild(label);
+          });
+
+          questionEl.appendChild(optsContainer);
+
+          if (q.note) {
+            const footer = document.createElement("div");
+            footer.className = "question-footer";
+            footer.textContent = q.note;
+            questionEl.appendChild(footer);
+          }
+
+          const feedback = document.createElement("div");
+          feedback.className = "feedback";
+          feedback.style.display = "none";
+          questionEl.appendChild(feedback);
+
+          sectionCard.appendChild(questionEl);
+        });
+
+        sectionsContainer.appendChild(sectionCard);
+      });
+
+      updateTotals(0, totalQuestions);
+      resetScoreDisplay();
+      currentExamLabelEl.textContent = exam.title;
+    }
+
+    function updateTotals(correct, total) {
+      correctCountEl.textContent = correct;
+      totalCountEl.textContent = total;
+    }
+
+    function resetScoreDisplay() {
+      scorePercentEl.textContent = "–%";
+      scoreSummaryEl.textContent = "Answer questions & submit to see your score.";
+      statusPillEl.style.visibility = "hidden";
+      statusPillEl.textContent = "";
+      statusPillEl.className = "status-pill"; // reset classes
+    }
+
+    function gradeCurrentExam() {
+      const examId = examSelect.value;
+      const exam = exams[examId];
+      if (!exam || !exam.sections || exam.sections.length === 0) {
+        alert("This exam does not have any questions yet.");
+        return;
+      }
+
+      const questionEls = sectionsContainer.querySelectorAll(".question");
+      let total = 0;
+      let correct = 0;
+
+      questionEls.forEach((qEl) => {
+        total++;
+        qEl.classList.remove("correct", "incorrect");
+        const feedback = qEl.querySelector(".feedback");
+        feedback.style.display = "none";
+        feedback.textContent = "";
+        feedback.classList.remove("correct", "incorrect");
+
+        const correctAnswer = qEl.dataset.correctAnswer;
+        const qId = qEl.dataset.questionId;
+        const name = `${examId}__${qId}`;
+        const selected = sectionsContainer.querySelector(
+          `input[name="${name}"]:checked`
+        );
+        if (!selected) {
+          // unanswered
+          qEl.classList.add("incorrect");
+          feedback.style.display = "block";
+          feedback.classList.add("incorrect");
+          feedback.textContent = `No answer selected. Correct answer: ${correctAnswer}.`;
+          return;
+        }
+
+        if (selected.value === correctAnswer) {
+          correct++;
+          qEl.classList.add("correct");
+          feedback.style.display = "block";
+          feedback.classList.add("correct");
+          feedback.textContent = "Correct.";
+        } else {
+          qEl.classList.add("incorrect");
+          feedback.style.display = "block";
+          feedback.classList.add("incorrect");
+          feedback.textContent = `Incorrect. Correct answer: ${correctAnswer}.`;
+        }
+      });
+
+      updateTotals(correct, total);
+
+      if (total === 0) {
+        resetScoreDisplay();
+        return;
+      }
+
+      const percent = (correct / total) * 100;
+      const rounded = Math.round(percent * 10) / 10;
+      scorePercentEl.textContent = `${rounded}%`;
+      scoreSummaryEl.textContent = `${correct} of ${total} questions correct.`;
+
+      const passed = percent >= PASS_THRESHOLD * 100;
+      statusPillEl.style.visibility = "visible";
+      statusPillEl.textContent = passed ? "PASS" : "FAIL";
+      statusPillEl.className =
+        "status-pill " + (passed ? "status-pass" : "status-fail");
+    }
+
+    // ===== EVENT HOOKS =====
+
+    examSelect.addEventListener("change", () => {
+      const examId = examSelect.value;
+      renderExam(examId);
+    });
+
+    submitButton.addEventListener("click", () => {
+      gradeCurrentExam();
+    });
+
+    // Prevent default HTML form submission
+    examForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      gradeCurrentExam();
+    });
+
+    // Initial render
+    renderExam("exam1");
+  </script>
+</body>
+</html>
