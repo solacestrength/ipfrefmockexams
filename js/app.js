@@ -553,5 +553,5 @@ window.addEventListener("load", () => {
       splash.classList.add("fade-out");
       setTimeout(() => splash.remove(), 900);
     }
-  }, 2500);
+  }, 1500);
 });
