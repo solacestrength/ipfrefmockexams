@@ -6,17 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
 </head>
+
 <body>
+
+  <!-- ⭐ Correct placement: FIRST element inside <body> ⭐ -->
+  <div id="customSplash" class="custom-splash">
+    <img src="icons/icon-512.png" alt="IPF Logo" class="splash-logo">
+  </div>
+
   <div class="app-shell">
-    <div id="customSplash" class="custom-splash">
-  <img src="icons/icon-512.png" alt="IPF Logo" class="splash-logo">
-</div>
+
     <header class="app-header">
       <div class="header-top">
         <h1>IPF Technical Rules<br>Mock Exams</h1>
         <button id="themeToggle" class="theme-toggle">🌙 Dark Mode</button>
       </div>
+
       <p class="header-sub">
         Practice multiple-choice exams based on the IPF Technical Rulebook.
       </p>
@@ -73,14 +80,18 @@
         <button id="exportWrong" class="export-btn">Download Incorrect Only</button>
       </div>
     </main>
+
   </div>
 
   <script src="js/exams.js"></script>
   <script src="js/app.js"></script>
+
+  <!-- Service worker registration -->
   <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-  }
-</script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+
 </body>
 </html>
